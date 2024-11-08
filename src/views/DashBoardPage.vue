@@ -50,7 +50,7 @@
                                     <th>Fullname</th>
                                     <th>Email</th>
                                     <th>Date & Time</th>
-                                    <th>Subscribed</th>
+                                    <!-- <th>Subscribed</th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -58,7 +58,7 @@
                                     <td>{{ user.name }}</td>
                                     <td>{{ user.email }}</td>
                                     <td>{{ user.createdAt }}</td>
-                                    <td><span class="status completed">Completed</span></td>
+                                    <!-- <td><span class="status completed">Completed</span></td> -->
                                 </tr>
                             </tbody>
                         </table>
