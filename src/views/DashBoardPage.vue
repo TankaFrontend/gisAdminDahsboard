@@ -27,7 +27,7 @@
                     <!-- Search icon -->
                     </div>
                 <div class="user-info">
-                <div class="user-name">Victor O.<br><small>Administrator</small></div>
+                <div class="user-name"><small>Administrator</small></div>
                 </div>
             </div>
 
@@ -38,7 +38,7 @@
                 </div>
              
             <div class="body" v-if="!isHeritageRoute">
-                <h2>Welcome, Daniel</h2>
+                <h2>Welcome, Admin</h2>
                 <p>Monday, 05 August 2025</p>
                 <h2>Users</h2>
                 
