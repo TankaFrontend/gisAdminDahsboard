@@ -1,5 +1,5 @@
 /*eslint-disable*/
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter,createWebHashHistory} from "vue-router";
 import AdminLoginPage from "@/components/AdminLoginPage.vue";
 import DashBoardPage from "@/views/DashBoardPage.vue";
 import HeritageSitePage from "@/views/HeritageSitePage.vue";
