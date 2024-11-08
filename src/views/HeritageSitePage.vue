@@ -6,7 +6,7 @@
         </div>
         <div class="product-list">
             <div class="product-card" v-for="site in sites" :key="site._id">
-                <img src="../assets/img/Adaada_House_Mysterious_Stream.jpg" alt="White T-Shirt">
+                <img :src="site.image"  alt="White T-Shirt">
                 <div class="product-title">{{ site.name }}</div>
                 <div class="product-units">Longitude: {{ site.longitude }}, Latitude:{{site.latitude}}</div>
                 <!-- <div class="product-price">$40</div> -->
