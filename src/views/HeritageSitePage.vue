@@ -9,7 +9,7 @@
                 <img src="../assets/img/Adaada_House_Mysterious_Stream.jpg" alt="White T-Shirt">
                 <div class="product-title">{{ site.name }}</div>
                 <div class="product-units">Longitude: {{ site.longitude }}, Latitude:{{site.latitude}}</div>
-                <div class="product-price">$40</div>
+                <!-- <div class="product-price">$40</div> -->
                 <button class="product_button">Update</button>
             <button class="delete-product">Delete Site</button>
             </div>
