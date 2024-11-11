@@ -149,12 +149,14 @@ export default {
                         const modalElement = document.getElementById("staticBackdrop");
                         const modalInstance = Modal.getInstance(modalElement);
                         modalInstance.hide();
+                        window.location.reload
                     }
                     else{
                         this.error = 'data not uploaded';
                         const modalElement = document.getElementById("staticBackdrop");
                         const modalInstance = Modal.getInstance(modalElement);
                         modalInstance.hide();
+                        window.location.reload
                     }
 
                 })
