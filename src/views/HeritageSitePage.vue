@@ -1,33 +1,29 @@
 <template>
-
     <div class="inventory-container">
         <div class="inventory-header">
-            <a data-bs-toggle="modal" data-bs-target="#staticBackdrop" class="add-product">Add Site</a>
+            <a data-bs-toggle="modal" data-bs-target="#addSiteModal" class="add-product">Add Site</a>
         </div>
         <div class="product-list">
             <div class="product-card" v-for="site in sites" :key="site._id">
-                <img :src="site.image"  alt="White T-Shirt">
+                <img :src="site.image" alt="Site Image">
                 <div class="product-title">{{ site.name }}</div>
-                <div class="product-units">Longitude: {{ site.longitude }}, Latitude:{{site.latitude}}</div>
-                <!-- <div class="product-price">$40</div> -->
-                <button class="product_button">Update</button>
-            <button class="delete-product">Delete Site</button>
+                <div class="product-units">Longitude: {{ site.longitude }}, Latitude: {{ site.latitude }}</div>
+                <button class="product_button" @click="openUpdateModal(site)">Update</button>
+                <button class="delete-product" @click="deleteSite(site._id)">Delete Site</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal -->
-    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-        <div class="modal-header">
-            <h1 class="modal-title fs-5" id="staticBackdropLabel">Modal title</h1>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-            <div class="modal-body">
-    
-                <form @submit.prevent="submitForm">
-                        
+    <!-- Add Site Modal -->
+    <div class="modal fade" id="addSiteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="addSiteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addSiteModalLabel">Add New Site</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="submitForm">
                         <div class="mb-3">
                             <label for="siteName" class="form-label">Name</label>
                             <input type="text" class="form-control" id="siteName" v-model="name" required>
@@ -52,33 +48,85 @@
                             <label for="longitude" class="form-label">Longitude</label>
                             <input type="text" class="form-control" id="longitude" v-model="longitude" required>
                         </div>
+
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit"  class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary">
                             <span v-if="loading">           
                                 <div class="loader"></div>
                             </span>
                             <span v-else>Submit</span>
                         </button>
                     </form>
-
-
-
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Update Site Modal -->
+    <div class="modal fade" id="updateSiteModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="updateSiteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="updateSiteModalLabel">Update Site</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="submitUpdateForm">
+                        <div class="mb-3">
+                            <label for="siteName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="siteName" v-model="name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="siteDetail" class="form-label">Detail</label>
+                            <textarea class="form-control" id="siteDetail" v-model="detail" rows="4" required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="siteImage" class="form-label">Upload Image</label>
+                            <input type="file" class="form-control" name="image" id="image" @change="handleImageUpload" accept="image/*" />
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="latitude" class="form-label">Latitude</label>
+                            <input type="text" class="form-control" id="latitude" v-model="latitude" required>
+                        </div>
+                    
+                        <div class="mb-3">
+                            <label for="longitude" class="form-label">Longitude</label>
+                            <input type="text" class="form-control" id="longitude" v-model="longitude" required>
+                        </div>
+
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">
+                            <span v-if="loading">           
+                                <div class="loader"></div>
+                            </span>
+                            <span v-else>Update</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
 </template>
+
+
+
+
+
+
+
+
 
 <script>
 import axios from 'axios';
 import { Modal } from 'bootstrap';
 
-
-
 export default {
-    name:'loginPage',
-    data:() =>{
+    name: 'loginPage',
+    data() {
         return {
             sites: [],
             name: "",
@@ -87,111 +135,153 @@ export default {
             latitude: "",
             longitude: "",
             loading: false,
+            isEditing: false,  // To track whether we are editing a site
+            currentSiteId: null, // To store the site id for updates
         };
     },
-
-
-    computed:{
-
-        isHeritageRoute() {
-            return this.$route.path.includes('/heritageSite');
-        },
-
-    },
-
-
 
     mounted() {
         let userLogin = localStorage.getItem('adminAuth');
         if (!userLogin) {
             this.$router.push({ name: 'adminLoginPage' });
-        } 
-        // this.fetchUsers();
-    },
-
-    methods: {
-
-        handleImageUpload(e) {
-            this.image = e.target.files[0];
-           
-        },
-
-
-            submitForm()
-            {
-
-                const formData = new FormData();
-                formData.append('name', this.name);
-                formData.append('detail', this.detail);
-                formData.append('latitude', this.longitude);
-                formData.append('longitude', this.latitude);
-                formData.append('image', this.image);
-
-                console.log(...formData);
-
-                this.loading = true;
-                const token = localStorage.getItem('adminAuth');
-                fetch("https://projectbackend-7waf.onrender.com/api/heritageSite/createHeritageSite", {
-                    
-                    method: "POST",
-                    headers: {
-                    "Accept":"application/json",
-                    "Authorization": `Bearer ${token}`,
-                    },
-                    body: formData,
-                })
-                .then(res => res.json())
-                .then(res => {
-                    console.log(res)
-                    
-                    if (res.message == 'HeritageSite Created'){
-                        this.loading = false;
-                        const modalElement = document.getElementById("staticBackdrop");
-                        const modalInstance = Modal.getInstance(modalElement);
-                        modalInstance.hide();
-                        window.location.reload
-                    }
-                    else{
-                        this.error = 'data not uploaded';
-                        const modalElement = document.getElementById("staticBackdrop");
-                        const modalInstance = Modal.getInstance(modalElement);
-                        modalInstance.hide();
-                        window.location.reload
-                    }
-
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-
-                    this.error = 'Data not Uploaded'
-                });
-            },
-
-
-        async fetchUsers() {
-            try {
-            const token = localStorage.getItem('adminAuth');
-            const res = await axios.get('https://projectbackend-7waf.onrender.com/api/heritageSite/getHeritageSites', {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-            this.sites = res.data;
-            console.log(res.data);
-            
-
-        } catch (error) {
-            console.error('Error fetching users:', error);
         }
-        },
-    },
-    
-    created() {
         this.fetchUsers();
     },
 
-}
+    methods: {
+        // Open the Update modal with existing data
+        openUpdateModal(site) {
+            this.isEditing = true;
+            this.currentSiteId = site._id;
+            this.name = site.name;
+            this.detail = site.detail;
+            this.latitude = site.latitude;
+            this.longitude = site.longitude;
+
+            // Open the Update Site modal
+            const modalElement = document.getElementById("updateSiteModal");
+            const modalInstance = new Modal(modalElement);
+            modalInstance.show();
+        },
+
+        handleImageUpload(e) {
+            this.image = e.target.files[0];
+        },
+
+        // Submit new site (Add Site)
+        submitForm() {
+            const formData = new FormData();
+            formData.append('name', this.name);
+            formData.append('detail', this.detail);
+            formData.append('latitude', this.latitude);
+            formData.append('longitude', this.longitude);
+            formData.append('image', this.image);
+
+            this.loading = true;
+            const token = localStorage.getItem('adminAuth');
+            fetch("https://projectbackend-7waf.onrender.com/api/heritageSite/createHeritageSite", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: formData,
+            })
+            .then(res => res.json())
+            .then(res => {
+                this.loading = false;
+                const modalElement = document.getElementById("addSiteModal");
+                const modalInstance = Modal.getInstance(modalElement);
+                modalInstance.hide();
+                if (res.message === 'HeritageSite Created') {
+                    this.fetchUsers();
+                    window.location.reload
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.loading = false;
+            });
+        },
+
+        // Submit updated site (Update Site)
+        submitUpdateForm() {
+            const formData = new FormData();
+            formData.append('name', this.name);
+            formData.append('detail', this.detail);
+            formData.append('latitude', this.latitude);
+            formData.append('longitude', this.longitude);
+            if (this.image) formData.append('image', this.image);
+
+            this.loading = true;
+            const token = localStorage.getItem('adminAuth');
+            fetch(`https://projectbackend-7waf.onrender.com/api/heritageSite/updateHeritageSite/${this.currentSiteId}`, {
+                method: "PUT",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+                body: formData,
+            })
+            .then(res => res.json())
+            .then(res => {
+                this.loading = false;
+                const modalElement = document.getElementById("updateSiteModal");
+                const modalInstance = Modal.getInstance(modalElement);
+                modalInstance.hide();
+                if (res.message === 'HeritageSite Updated') {
+                    this.fetchUsers();
+                    window.location.reload
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                this.loading = false;
+            });
+        },
+
+        async fetchUsers() {
+            try {
+                const token = localStorage.getItem('adminAuth');
+                const res = await axios.get('https://projectbackend-7waf.onrender.com/api/heritageSite/getHeritageSites', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
+                this.sites = res.data;
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
+        },
+
+        async deleteSite(siteId) {
+            const token = localStorage.getItem('adminAuth');
+            try {
+                const response = await fetch(`https://projectbackend-7waf.onrender.com/api/heritageSite/deleteHeritageSite/${siteId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                const data = await response.json();
+                if (data.message === 'HeritageSite removed') {
+                    this.sites = this.sites.filter(site => site._id !== siteId);
+                    alert('Site deleted successfully');
+                } else {
+                    alert('Failed to delete site');
+                }
+            } catch (error) {
+                console.error('Error deleting site:', error);
+                alert('Error occurred while deleting the site');
+            }
+        },
+    },
+};
 </script>
+
+
+
+
+
 
 <style scoped>
 
